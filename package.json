@@ -1,8 +1,8 @@
 {
   "name": "tern-threejs",
   "version": "0.1.0",
-  "description": "tern definition generators",
-  "private": true,
+  "main": "threejs.json",
+  "description": "A Tern plugin adding support for three.js.",
   "repository": {
     "type": "git",
     "url": "github.com/tylerwbell/tern-threejs"
@@ -17,8 +17,16 @@
   },
   "homepage": "https://github.com/tylerwbell/tern-threejs",
   "dependencies": {
+    "tern": ">=0.10.0",
+    "acorn": ">=1.0.0"
+  },
+  "devDependencies": {
     "glob": "^5.0.5",
     "jsdom": "^5.3.0",
     "q": "^1.3.0"
-  }
+  },
+  "keywords": [
+    "tern",
+    "threejs"
+  ]
 }
