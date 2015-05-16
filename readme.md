@@ -5,3 +5,8 @@ Generate [tern](http://ternjs.net) type definitions for [three.js](http://threej
 ```bash
 $ ./generate.sh
 ```
+
+This will generate the definitions in two formats:
+
+* ```threejs.json``` - JSON Type Definitions
+* ```threejs.js``` - Tern Plugin

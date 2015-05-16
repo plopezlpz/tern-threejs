@@ -7,7 +7,29 @@ var Q = require('q');
 var jsdomenv = Q.denodeify(jsdom.env);
 var glob = Q.denodeify(glob);
 
-var reference = 'http://threejs.org/docs/#Reference/';
+//
+
+var ThreeJSDocumentionBasePath = 'http://threejs.org/docs/#Reference/';
+var JSONTypeDefinitionFilename = 'threejs.json';
+var TernPluginFilename = 'threejs.js';
+
+function TernPluginTemplate(json) {
+  return `(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    return mod(require("tern/lib/infer"), require("tern/lib/tern"));
+  if (typeof define == "function" && define.amd) // AMD
+    return define([ "tern/lib/infer", "tern/lib/tern" ], mod);
+  mod(tern, tern);
+})(function(infer, tern) {
+  "use strict";
+
+  tern.registerPlugin("threejs", function(server, options) {
+    return {
+      defs : ${json}
+    };
+  });
+});`;
+}
 
 //
 
@@ -89,7 +111,7 @@ function objectDefinition(filename) {
 
   var definition = {
     '!name': path.basename(filename, '.html'),
-    '!url': reference + path.relative('three.js/docs/api', filename).split('.html')[0],
+    '!url': ThreeJSDocumentionBasePath + path.relative('three.js/docs/api', filename).split('.html')[0],
     'prototype': {}
   };
 
@@ -107,7 +129,7 @@ function objectDefinition(filename) {
       }
 
       var elements = document.getElementsByTagName('h3');
-      for (var i = 0; i < elements.length; i+= 1) {
+      for (var i = 0; i < elements.length; i += 1) {
         var element = elements[i];
         var text = element.innerHTML;
 
@@ -178,7 +200,19 @@ glob('three.js/docs/api/**/*.html')
 
     return Q.all(promises)
       .then(function() {
-        console.log(JSON.stringify(defs, null, 2));
+        var json = JSON.stringify(defs, null, 2);
+
+        fs.writeFile(JSONTypeDefinitionFilename, json, function(err) {
+          if (err) throw err;
+
+          console.log(`generated ${JSONTypeDefinitionFilename}`);
+        });
+
+        fs.writeFile(TernPluginFilename, TernPluginTemplate(json), function(err) {
+          if (err) throw err;
+
+          console.log(`generated ${TernPluginFilename}`);
+        });
       });
   }).fail(function(error) {
     console.log(error.stack);
