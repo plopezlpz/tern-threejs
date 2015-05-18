@@ -53,7 +53,7 @@ function defineThreeJSType(type) {
 }
 
 function ThreeJSPrototype(type) {
-  return `${type}`;
+  return `THREE.${type}.prototype`;
 }
 
 //
@@ -112,10 +112,8 @@ function methodDefinition(str) {
 }
 
 function objectDefinition(filename) {
-  var prototypeRegex = /\[page:([\w\.]+)\]/gi;
+  var prototypeRegex = /\[page:([\w\.]+)\]\s*&rarr;\s*$/gim;
   var constructorRegex = /\[name\]\(\s*[\[page:\w+\s*\w*\],?\s*]*\s*\)/gi;
-  var methodRegex = /\[method:([\w]+) ([\w\.\s]+)\]\(\s*[\[page:\w+\s*\w*\],?\s*]*\s*\)/gi;
-  var propertyRegex = /\[property:([\w]+) ([\w\.\s]+)\]/gi;
 
   var html = fs.readFileSync(filename, 'utf8');
 
@@ -139,6 +137,8 @@ function objectDefinition(filename) {
 
       var elements = document.getElementsByTagName('h3');
       for (var i = 0; i < elements.length; i += 1) {
+        var methodRegex = /\[method:([\w]+) ([\w\.\s]+)\]\(\s*[\[page:\w+\s*\w*\],?\s*]*\s*\)/gi;
+        var propertyRegex = /\[property:([\w]+) ([\w\.\s]+)\]/gi;
         var element = elements[i];
         var text = element.innerHTML;
 
