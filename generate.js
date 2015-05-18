@@ -37,16 +37,26 @@ var typesMap = {
   'Integer': 'number',
   'Number': 'number',
   'Float': 'number',
-  'Array': 'array',
-  'Boolean': 'boolean',
+  'Array': '[]',
+  'Boolean': 'bool',
   'String': 'string',
   'Function': 'function',
   'Object': 'object'
 };
 
-function mapType(type) {
+function ThreeJSType(type) {
   return typesMap[type] || type;
 }
+
+function defineThreeJSType(type) {
+  typesMap[type] = `+THREE.${type}`;
+}
+
+function ThreeJSPrototype(type) {
+  return `${type}`;
+}
+
+//
 
 function parameters(str) {
   var parameterRegex = /(?:\[page:([\w\.]+)\s+([\w\.]+)\])|(?:([\w\.]+)\s*[\),])/gi;
@@ -55,7 +65,7 @@ function parameters(str) {
   while ((match = parameterRegex.exec(str)) !== null) {
     parameters.push({
       name: match[2] || match[3],
-      type: mapType(match[1])
+      type: ThreeJSType(match[1])
     });
   }
 
@@ -92,7 +102,7 @@ function methodDefinition(str) {
   var match = methodRegex.exec(str);
 
   var name = match[2];
-  var type = mapType(match[1]);
+  var type = ThreeJSType(match[1]);
   var params = parameters(str);
 
   return {
@@ -110,14 +120,13 @@ function objectDefinition(filename) {
   var html = fs.readFileSync(filename, 'utf8');
 
   var definition = {
-    '!name': path.basename(filename, '.html'),
     '!url': ThreeJSDocumentionBasePath + path.relative('three.js/docs/api', filename).split('.html')[0],
     'prototype': {}
   };
 
   var prototype = prototypeRegex.exec(html);
   if (prototype) {
-    definition['prototype']['!proto'] = mapType(prototype[1]);
+    definition['prototype']['!proto'] = ThreeJSPrototype(prototype[1]);
   }
 
   return jsdomenv(html)
@@ -165,7 +174,7 @@ function objectDefinition(filename) {
             type = method.definition;
           } else if (property) {
             name = property[2];
-            type = mapType(property[1]);
+            type = ThreeJSType(property[1]);
           }
 
           if (doc) {
@@ -190,11 +199,16 @@ glob('three.js/docs/api/**/*.html')
       'THREE': {}
     };
 
+    files.forEach(function(filename) {
+      var typename = path.basename(filename, '.html');
+      defineThreeJSType(typename);
+    });
+
     var promises = files.map(function(filename) {
       return objectDefinition(filename)
         .then(function(def) {
-          var name = def['!name'];
-          defs['THREE'][name] = def;
+          var typename = path.basename(filename, '.html');
+          defs['THREE'][typename] = def;
         })
     });
 
