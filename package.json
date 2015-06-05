@@ -1,7 +1,7 @@
 {
   "name": "tern-threejs",
   "version": "0.1.0",
-  "main": "threejs.json",
+  "main": "threejs.js",
   "description": "A Tern plugin adding support for three.js.",
   "repository": {
     "type": "git",
