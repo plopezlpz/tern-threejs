@@ -2,6 +2,8 @@
 
 Generate [tern](http://ternjs.net) type definitions for [three.js](http://threejs.org/).
 
+[Online Demo](http://demo-angelozerr.rhcloud.com/CodeMirror-Java/threejs.html)
+
 ```bash
 $ ./generate.sh
 ```
